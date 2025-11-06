@@ -1,14 +1,12 @@
 <template>
     <div role="img" aria-label="Activity last 30 days" class="absolute right-0 bottom-0 z-20">
         <div class="relative z-10">
-            <div class="flex items-end gap-0.5 h-20 w-44 max-w-72" style="
-            mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-            -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-          ">
+            <div class="flex items-end gap-0.5 h-20 w-44 max-w-72"
+                style="mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);">
                 <a v-for="(bar, i) in bars" :key="i" :href="bar.href" target="_blank" rel="noopener" :title="bar.title"
-                    class="block w-[4px] sm:w-[6px] rounded-t transition-all duration-500" :style="{
+                    class="block w-[4px] sm:w-[6px] rounded-t transition-all duration-500 bg-theme-950/40 dark:bg-theme-50/50"
+                    :style="{
                         height: `${bar.height}px`,
-                        backgroundColor: 'rgba(255,255,255,0.45)',
                         opacity: Math.min(0.3 + bar.value / maxValue, 1)
                     }"></a>
             </div>
@@ -24,7 +22,7 @@ const bars = ref<{ height: number; value: number; title: string; href: string }[
 const maxValue = ref(1)
 
 async function fetchActivity() {
-    const res = await $fetch<activity>('/api/profile/activity?username=torvalds')
+    const res = await $fetch<activity>('/api/profile/activity')
     const data = res.data || []
     maxValue.value = Math.max(1, ...data.map(d => d.count))
 
