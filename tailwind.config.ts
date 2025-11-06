@@ -19,6 +19,7 @@ const themeColorIndex = Number(process.env.THEME_COLOR) || 0
 const themeColor = themeColors[themeColorIndex] || themeColors[0]
 
 export default {
+    // darkMode: 'class',
     theme: {
         extend: {
             colors: themeColor,

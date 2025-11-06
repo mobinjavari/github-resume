@@ -15,12 +15,20 @@
     color-scheme: dark;
   }
 
+  :root {
+    --pattern-x: url("/svg/x-black.svg");
+  }
+
   body {
-    @apply bg-theme-50 text-theme-900;
+    @apply bg-theme-100 text-theme-900;
     @apply min-h-screen overflow-x-hidden;
   }
 
   @media (prefers-color-scheme: dark) {
+    :root {
+      --pattern-x: url("/svg/x-white.svg");
+    }
+
     body {
       @apply bg-theme-950 text-theme-50;
     }
@@ -31,5 +39,9 @@
   img {
     -webkit-user-drag: none;
     user-select: none;
+  }
+
+  .pattern-x {
+    background-image: var(--pattern-x);
   }
 }
