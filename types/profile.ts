@@ -1,6 +1,7 @@
 export interface Status {
     emojiHTML?: string
     message: string
+    indicatesLimitedAvailability: boolean
 }
 
 export interface Profile {

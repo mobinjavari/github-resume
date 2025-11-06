@@ -11,8 +11,8 @@ const themeColors = [
         },
         success: colors.green,
         warning: colors.amber,
-        info: colors.sky,
-        danger: colors.red,
+        info: colors.teal,
+        danger: colors.red
     }
 ]
 const themeColorIndex = Number(process.env.THEME_COLOR) || 0

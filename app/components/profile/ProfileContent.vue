@@ -10,10 +10,11 @@
             <div class="flex-1 space-y-2 relative z-10">
                 <div class="flex items-center gap-2 flex-wrap pb-2">
                     <h2 class="text-2xl font-bold">{{ profile.name }}</h2>
-                    <a :href="profile.url" target="_blank" rel="noopener"
-                        class="text-sm text-gray-600 dark:text-gray-300 hover:underline">
-                        @{{ profile.login }}
-                    </a>
+                    <span class="text-sm text-theme-600 dark:text-theme-300">
+                        @<a :href="profile.url" target="_blank" rel="noopener" class="hover:underline">
+                            {{ profile.login }}
+                        </a>
+                    </span>
                     <ProfileMeta :profile="profile" />
                 </div>
 
@@ -33,7 +34,6 @@ import ProfileAvatar from './ProfileAvatar.vue';
 import ProfileMeta from './ProfileMeta.vue';
 import ProfileBadge from './ProfileBadge.vue'
 import ProfileStats from './ProfileStats.vue'
-
 import type { Profile } from '~/../types/profile'
 
 defineProps<{ profile: Profile }>()

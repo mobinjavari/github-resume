@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
     status {
       message
       emojiHTML
+      indicatesLimitedAvailability
     }
     followers {
       totalCount

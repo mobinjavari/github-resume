@@ -1,5 +1,5 @@
 <template>
-    <Content :pending="pending" :error="error" :data="profile">
+    <Content :error="error">
         <ProfileContent v-if="profile" :profile="profile" />
     </Content>
 </template>
@@ -8,5 +8,5 @@
 import Content from '~/components/ui/Content.vue'
 import ProfileContent from './profile/ProfileContent.vue'
 
-const { data: profile, pending, error } = await useFetch('/api/profile', { server: false })
+const { data: profile, error } = await useFetch('/api/profile')
 </script>
