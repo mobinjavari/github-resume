@@ -1,28 +1,27 @@
 import colors from 'tailwindcss/colors'
 
-const themeColors = [
-    {
+const themeColors = {
+    default: {
         theme: colors.gray,
         primary: colors.blue,
         gradient: {
-            from: colors.indigo,
-            via: colors.emerald,
-            to: colors.purple
+            from: colors.indigo[600],
+            via: colors.emerald[500],
+            to: colors.purple[600]
         },
         success: colors.green,
         warning: colors.amber,
         info: colors.teal,
         danger: colors.red
     }
-]
-const themeColorIndex = Number(process.env.THEME_COLOR) || 0
-const themeColor = themeColors[themeColorIndex] || themeColors[0]
+}
+const themeColorName = (process.env.THEME_COLOR || 'default') as keyof typeof themeColors
+const themeColor = themeColors[themeColorName] ?? themeColors.default
 
 export default {
-    // darkMode: 'class',
     theme: {
         extend: {
-            colors: themeColor,
-        },
-    },
+            colors: themeColor
+        }
+    }
 }

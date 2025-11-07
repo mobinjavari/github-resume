@@ -24,6 +24,7 @@ export async function fetchGitHub(query: string, variables: Record<string, any> 
   })
 
   const data = await res.json()
+  
   if (res.status > 200) {
     throw createError({
       statusCode: res.status,

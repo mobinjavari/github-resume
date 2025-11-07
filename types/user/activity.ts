@@ -3,7 +3,7 @@ export interface DayData {
     count: number
 }
 
-export interface activity {
+export interface Activity {
     url: string
     data: DayData[]
 }

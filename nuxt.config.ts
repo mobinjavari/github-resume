@@ -5,7 +5,6 @@ export default defineNuxtConfig({
   css: ['@/assets/styles/main.scss'],
   modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-    THEME_COLOR: process.env.THEME_COLOR || '0',
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN
   },
 })

@@ -12,11 +12,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Profile } from '~/../types/profile'
 import CompanyIcon from '~/components/icons/CompanyIcon.vue'
 import LocationIcon from '~/components/icons/LocationIcon.vue'
 import EmailIcon from '~/components/icons/EmailIcon.vue'
 import LinkIcon from '~/components/icons/LinkIcon.vue'
+
+import type { Profile } from '~~/types/user/profile'
 
 const { profile } = defineProps<{ profile: Profile }>()
 const items = [

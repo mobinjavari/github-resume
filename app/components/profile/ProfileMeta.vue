@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Profile } from '~/../types/profile'
+import type { Profile } from '~~/types/user/profile'
 
 const { profile } = defineProps<{ profile: Profile }>()
 

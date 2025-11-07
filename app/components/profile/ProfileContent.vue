@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative h-40 sm:h-36 bg-gradient-to-r from-gradient-from-600/20 via-gradient-via-500/20 to-gradient-to-600/20 dark:from-gradient-from-500/10 dark:via-gradient-via-400/10 dark:to-gradient-to-500/10 overflow-visible">
+        class="relative h-40 sm:h-36 bg-gradient-to-r from-gradient-from/20 via-gradient-via/20 to-gradient-to/20 dark:from-gradient-from/10 dark:via-gradient-via/10 dark:to-gradient-to/10 overflow-visible">
         <MiniSpark />
     </div>
 
@@ -34,7 +34,8 @@ import ProfileAvatar from './ProfileAvatar.vue';
 import ProfileMeta from './ProfileMeta.vue';
 import ProfileBadge from './ProfileBadge.vue'
 import ProfileStats from './ProfileStats.vue'
-import type { Profile } from '~/../types/profile'
+
+import type { Profile } from '~~/types/user/profile'
 
 defineProps<{ profile: Profile }>()
 </script>

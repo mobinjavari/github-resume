@@ -1,5 +1,4 @@
-import { fetchGitHub } from '../utils/fetchGithub'
-import { Profile } from '../../types/profile'
+import type { Profile } from '~/../types/user/profile'
 
 export default defineEventHandler(async (event) => {
   const params = getQuery(event)
@@ -46,12 +45,9 @@ export default defineEventHandler(async (event) => {
   `
 
   const user = await fetchGitHub(query, { username })
-  const stars = user.repositories.nodes.reduce(
-    (acc: number, repo: { stargazerCount: number }) => acc + repo.stargazerCount,
-    0
-  )
+  const stars = user.repositories.nodes.reduce((acc: number, repo: { stargazerCount: number }) => acc + repo.stargazerCount, 0)
 
-  return <Profile>{
+  return <Profile> {
     name: user.name,
     login: user.login,
     url: user.url,

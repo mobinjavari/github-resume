@@ -1,12 +1,14 @@
 <template>
-    <Content :error="error">
+    <Section :error="error">
         <ProfileContent v-if="profile" :profile="profile" />
-    </Content>
+    </Section>
 </template>
 
 <script setup lang="ts">
-import Content from '~/components/ui/Content.vue'
+import Section from '~/components/ui/Section.vue'
 import ProfileContent from './profile/ProfileContent.vue'
 
-const { data: profile, error } = await useFetch('/api/profile')
+import type { Profile } from '~~/types/user/profile'
+
+const { data: profile, error } = await useFetch<Profile>('/api/user/profile')
 </script>

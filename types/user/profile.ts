@@ -9,7 +9,7 @@ export interface Profile {
     login: string
     url: string
     avatarUrl: string
-    status?: Status | null
+    status?: Status
     bio?: string
     company?: string
     location?: string

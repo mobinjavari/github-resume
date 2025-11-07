@@ -1,5 +1,4 @@
-import { fetchGitHub } from '../../utils/fetchGithub'
-import type { activity, DayData } from '../../../types/profile/activity'
+import type { Activity, DayData } from '~/../types/user/activity'
 
 export default defineEventHandler(async (event) => {
   const params = getQuery(event)
@@ -34,7 +33,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return <activity> {
+  return <Activity> {
     url: activity?.url,
     data: daysData
   }

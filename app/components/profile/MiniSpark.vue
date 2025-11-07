@@ -16,13 +16,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import type { activity } from '~/../types/profile/activity'
+import type { Activity } from '~~/types/user/activity'
 
 const bars = ref<{ height: number; value: number; title: string; href: string }[]>([])
 const maxValue = ref(1)
 
 async function fetchActivity() {
-    const res = await $fetch<activity>('/api/profile/activity')
+    const res = await $fetch<Activity>('/api/user/activity')
     const data = res.data || []
     maxValue.value = Math.max(1, ...data.map(d => d.count))
 
