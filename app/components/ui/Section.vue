@@ -6,13 +6,15 @@
             {{ error }}
         </div>
         <div v-else>
-            <div v-if="title" class="flex items-center gap-2 p-4 text-theme-700 dark:text-theme-300">
-                <component v-if="icon" :is="icon" class="size-4" />
-                <h3 class="text-md font-medium">
+            <div v-if="title" class="flex items-center gap-3 px-5 py-4">
+                <component v-if="icon" :is="icon" class="size-5 text-theme-500 dark:text-theme-400" />
+                <h3 class="text-md font-semibold text-theme-800 dark:text-theme-100">
                     {{ title }}
                 </h3>
             </div>
-            <slot />
+            <div :class="title ? `px-5 pb-5 pt-2 space-y-4` : ``">
+                <slot />
+            </div>
         </div>
     </section>
 </template>
