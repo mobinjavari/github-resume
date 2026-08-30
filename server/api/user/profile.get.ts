@@ -1,4 +1,5 @@
 import type { Profile, Status } from '~/../types/user/profile'
+import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
 
 interface ProfileQueryResult {
   name: string
@@ -10,6 +11,7 @@ interface ProfileQueryResult {
   location: string | null
   websiteUrl: string | null
   email: string | null
+  twitterUsername: string | null
   status: Status | null
   followers: { totalCount: number }
   following: { totalCount: number }
@@ -20,9 +22,13 @@ interface ProfileQueryResult {
   createdAt: string
 }
 
-export default defineEventHandler(async (event): Promise<Profile> => {
+export default defineCachedEventHandler(async (event): Promise<Profile> => {
   const params = getQuery(event)
   const username = params.username as string | undefined
+  // Read directly from process.env: a value pulled from process.env inside
+  // nuxt.config.ts is baked in at build time, so it wouldn't react to this
+  // being toggled only when the built server actually starts.
+  const showEmail = process.env.SHOW_EMAIL === 'true'
 
   const query = `
     name
@@ -33,7 +39,8 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     company
     location
     websiteUrl
-    email
+    ${showEmail ? 'email' : ''}
+    twitterUsername
     status {
       message
       emojiHTML
@@ -76,7 +83,8 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     company: user.company ?? undefined,
     location: user.location ?? undefined,
     websiteUrl: user.websiteUrl ?? undefined,
-    email: user.email ?? undefined,
+    email: showEmail ? (user.email ?? undefined) : undefined,
+    twitterUsername: user.twitterUsername ?? undefined,
     status: user.status ?? undefined,
     followers: user.followers.totalCount,
     following: user.following.totalCount,
@@ -86,4 +94,8 @@ export default defineEventHandler(async (event): Promise<Profile> => {
     contributions: user.contributionsCollection.contributionCalendar.totalContributions,
     createdAt: user.createdAt,
   }
+}, {
+  name: 'user-profile',
+  maxAge: API_CACHE_MAX_AGE_SECONDS,
+  getKey: cacheKeyForUser,
 })

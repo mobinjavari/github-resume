@@ -15,6 +15,7 @@ export interface Profile {
   location?: string
   websiteUrl?: string
   email?: string
+  twitterUsername?: string
   followers: number
   following: number
   repositories: number
