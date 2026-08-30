@@ -1,6 +1,6 @@
 <template>
   <Section
-    v-if="orgs?.length"
+    v-if="pending || error || orgs?.length"
     :pending="pending"
     :error="error"
     title="Organizations"
