@@ -22,14 +22,22 @@ const { public: { siteUrl } } = useRuntimeConfig()
 const route = useRoute()
 const canonicalUrl = `${siteUrl}${route.path}`
 
+const summary = computed(() => {
+  if (!profile.value) return 'Auto-generated GitHub resume built from public GitHub profile data.'
+  return profile.value.bio
+    || `${profile.value.name} on GitHub — ${profile.value.repositories} public repos, ${profile.value.stars} stars, ${profile.value.followers} followers.`
+})
+
 useSeoMeta({
   title: () => profile.value ? `${profile.value.name} (@${profile.value.login})` : 'GitHub Resume',
-  description: () => profile.value?.bio || `Auto-generated GitHub resume for ${profile.value?.login ?? 'this developer'}.`,
+  description: summary,
+  ogSiteName: 'GitHub Resume',
   ogTitle: () => profile.value ? `${profile.value.name} (@${profile.value.login})` : 'GitHub Resume',
-  ogDescription: () => profile.value?.bio || 'Auto-generated GitHub resume built from public GitHub profile data.',
+  ogDescription: summary,
   ogImage: () => profile.value?.avatarUrl,
   ogUrl: canonicalUrl,
   twitterCard: 'summary',
+  twitterCreator: () => profile.value?.twitterUsername ? `@${profile.value.twitterUsername}` : undefined,
 })
 
 useHead(() => ({
