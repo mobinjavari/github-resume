@@ -16,10 +16,27 @@ interface ProfileQueryResult {
   followers: { totalCount: number } | null
   following: { totalCount: number } | null
   publicRepos: { totalCount: number } | null
-  gists: { totalCount: number } | null
   repositories: { nodes: { stargazerCount: number }[] } | null
   contributionsCollection: { contributionCalendar: { totalContributions: number } } | null
   createdAt: string
+}
+
+interface GistsQueryResult {
+  gists: { totalCount: number } | null
+}
+
+// GitHub's `gists` field is non-nullable in its schema, so a scope error on it
+// (the `gist` scope isn't granted to most tokens) nulls out the entire parent
+// object, not just this field. Fetching it as its own request keeps a missing
+// `gist` scope from taking down the rest of the profile.
+async function fetchGistsCount(username: string | undefined) {
+  try {
+    const result = await fetchGitHub<GistsQueryResult>('gists(privacy: PUBLIC) { totalCount }', { username })
+    return result.gists?.totalCount ?? 0
+  }
+  catch {
+    return 0
+  }
 }
 
 export default defineCachedEventHandler(async (event): Promise<Profile> => {
@@ -55,9 +72,6 @@ export default defineCachedEventHandler(async (event): Promise<Profile> => {
     publicRepos: repositories(privacy: PUBLIC) {
       totalCount
     }
-    gists(privacy: PUBLIC) {
-      totalCount
-    }
     repositories(ownerAffiliations: OWNER, first: 100) {
       nodes {
         stargazerCount
@@ -71,10 +85,13 @@ export default defineCachedEventHandler(async (event): Promise<Profile> => {
     createdAt
   `
 
-  const user = await fetchGitHub<ProfileQueryResult>(query, { username })
+  const [user, gists] = await Promise.all([
+    fetchGitHub<ProfileQueryResult>(query, { username }),
+    fetchGistsCount(username),
+  ])
   // Each of these can come back null if the token lacks the scope for that
-  // one field (e.g. `gists` needs the `gist` scope) — GitHub still returns
-  // the rest of the profile, so default the missing piece instead of failing.
+  // one field — GitHub still returns the rest of the profile, so default the
+  // missing piece instead of failing.
   const stars = (user.repositories?.nodes ?? []).reduce((total, repo) => total + repo.stargazerCount, 0)
 
   return {
@@ -92,7 +109,7 @@ export default defineCachedEventHandler(async (event): Promise<Profile> => {
     followers: user.followers?.totalCount ?? 0,
     following: user.following?.totalCount ?? 0,
     repositories: user.publicRepos?.totalCount ?? 0,
-    gists: user.gists?.totalCount ?? 0,
+    gists,
     stars,
     contributions: user.contributionsCollection?.contributionCalendar.totalContributions ?? 0,
     createdAt: user.createdAt,
