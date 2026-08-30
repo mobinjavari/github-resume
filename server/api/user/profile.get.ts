@@ -13,12 +13,12 @@ interface ProfileQueryResult {
   email: string | null
   twitterUsername: string | null
   status: Status | null
-  followers: { totalCount: number }
-  following: { totalCount: number }
-  publicRepos: { totalCount: number }
-  gists: { totalCount: number }
-  repositories: { nodes: { stargazerCount: number }[] }
-  contributionsCollection: { contributionCalendar: { totalContributions: number } }
+  followers: { totalCount: number } | null
+  following: { totalCount: number } | null
+  publicRepos: { totalCount: number } | null
+  gists: { totalCount: number } | null
+  repositories: { nodes: { stargazerCount: number }[] } | null
+  contributionsCollection: { contributionCalendar: { totalContributions: number } } | null
   createdAt: string
 }
 
@@ -72,7 +72,10 @@ export default defineCachedEventHandler(async (event): Promise<Profile> => {
   `
 
   const user = await fetchGitHub<ProfileQueryResult>(query, { username })
-  const stars = user.repositories.nodes.reduce((total, repo) => total + repo.stargazerCount, 0)
+  // Each of these can come back null if the token lacks the scope for that
+  // one field (e.g. `gists` needs the `gist` scope) — GitHub still returns
+  // the rest of the profile, so default the missing piece instead of failing.
+  const stars = (user.repositories?.nodes ?? []).reduce((total, repo) => total + repo.stargazerCount, 0)
 
   return {
     name: user.name,
@@ -86,12 +89,12 @@ export default defineCachedEventHandler(async (event): Promise<Profile> => {
     email: showEmail ? (user.email ?? undefined) : undefined,
     twitterUsername: user.twitterUsername ?? undefined,
     status: user.status ?? undefined,
-    followers: user.followers.totalCount,
-    following: user.following.totalCount,
-    repositories: user.publicRepos.totalCount,
-    gists: user.gists.totalCount,
+    followers: user.followers?.totalCount ?? 0,
+    following: user.following?.totalCount ?? 0,
+    repositories: user.publicRepos?.totalCount ?? 0,
+    gists: user.gists?.totalCount ?? 0,
     stars,
-    contributions: user.contributionsCollection.contributionCalendar.totalContributions,
+    contributions: user.contributionsCollection?.contributionCalendar.totalContributions ?? 0,
     createdAt: user.createdAt,
   }
 }, {

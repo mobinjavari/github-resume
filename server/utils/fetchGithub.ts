@@ -44,19 +44,18 @@ export async function fetchGitHub<T>(query: string, variables: Record<string, un
 
   const response: GraphQLResponse<T> = await res.json()
 
+  // GraphQL can return partial data alongside field-level errors (e.g. a scope
+  // the token lacks for just one field) — only treat it as fatal when there's
+  // no usable data at all, not whenever the errors array is non-empty.
   if (response.errors) {
     console.error('GitHub GraphQL API returned errors:', response.errors)
-    throw createError({
-      statusCode: 502,
-      statusMessage: 'Failed to fetch data from GitHub',
-    })
   }
 
   const result = isUserLookup ? response.data?.user : response.data?.viewer
   if (!result) {
     throw createError({
-      statusCode: 404,
-      statusMessage: 'GitHub user not found',
+      statusCode: response.errors ? 502 : 404,
+      statusMessage: response.errors ? 'Failed to fetch data from GitHub' : 'GitHub user not found',
     })
   }
 

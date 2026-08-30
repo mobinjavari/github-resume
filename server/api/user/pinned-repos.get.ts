@@ -6,7 +6,7 @@ const PINNED_REPOS_LIMIT = 6
 interface PinnedReposQueryResult {
   pinnedItems: {
     nodes: Repositories
-  }
+  } | null
 }
 
 export default defineCachedEventHandler(async (event): Promise<Repositories> => {
@@ -32,7 +32,7 @@ export default defineCachedEventHandler(async (event): Promise<Repositories> => 
   `
 
   const result = await fetchGitHub<PinnedReposQueryResult>(query, { username })
-  return result.pinnedItems.nodes
+  return result.pinnedItems?.nodes ?? []
 }, {
   name: 'user-pinned-repos',
   maxAge: API_CACHE_MAX_AGE_SECONDS,
