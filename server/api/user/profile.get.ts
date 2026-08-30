@@ -1,6 +1,26 @@
-import type { Profile } from '~/../types/user/profile'
+import type { Profile, Status } from '~/../types/user/profile'
 
-export default defineEventHandler(async (event) => {
+interface ProfileQueryResult {
+  name: string
+  login: string
+  url: string
+  avatarUrl: string
+  bio: string | null
+  company: string | null
+  location: string | null
+  websiteUrl: string | null
+  email: string | null
+  status: Status | null
+  followers: { totalCount: number }
+  following: { totalCount: number }
+  publicRepos: { totalCount: number }
+  gists: { totalCount: number }
+  repositories: { nodes: { stargazerCount: number }[] }
+  contributionsCollection: { contributionCalendar: { totalContributions: number } }
+  createdAt: string
+}
+
+export default defineEventHandler(async (event): Promise<Profile> => {
   const params = getQuery(event)
   const username = params.username as string | undefined
 
@@ -44,20 +64,20 @@ export default defineEventHandler(async (event) => {
     createdAt
   `
 
-  const user = await fetchGitHub(query, { username })
-  const stars = user.repositories.nodes.reduce((acc: number, repo: { stargazerCount: number }) => acc + repo.stargazerCount, 0)
+  const user = await fetchGitHub<ProfileQueryResult>(query, { username })
+  const stars = user.repositories.nodes.reduce((total, repo) => total + repo.stargazerCount, 0)
 
-  return <Profile> {
+  return {
     name: user.name,
     login: user.login,
     url: user.url,
     avatarUrl: user.avatarUrl,
     bio: user.bio?.trim(),
-    company: user.company,
-    location: user.location,
-    websiteUrl: user.websiteUrl,
-    email: user.email,
-    status: user.status,
+    company: user.company ?? undefined,
+    location: user.location ?? undefined,
+    websiteUrl: user.websiteUrl ?? undefined,
+    email: user.email ?? undefined,
+    status: user.status ?? undefined,
     followers: user.followers.totalCount,
     following: user.following.totalCount,
     repositories: user.publicRepos.totalCount,

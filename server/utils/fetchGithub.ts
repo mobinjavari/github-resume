@@ -1,17 +1,27 @@
-export async function fetchGitHub(query: string, variables: Record<string, any> = {}) {
+interface GraphQLError {
+  message: string
+}
+
+interface GraphQLResponse<T> {
+  data?: { user?: T, viewer?: T }
+  errors?: GraphQLError[]
+}
+
+export async function fetchGitHub<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
   const config = useRuntimeConfig()
-  const token = config.GITHUB_TOKEN
+  const token = config.githubToken
 
   if (!token) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'GITHUB_TOKEN is missing in environment variables'
+      statusMessage: 'GITHUB_TOKEN is missing in environment variables',
     })
   }
 
-  query = variables.username 
+  const isUserLookup = typeof variables.username === 'string'
+  const wrappedQuery = isUserLookup
     ? `query ($username: String!) { user (login: $username) { ${query} } }`
-    : `query () { viewer { ${query} } }`
+    : `query { viewer { ${query} } }`
 
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
@@ -20,23 +30,33 @@ export async function fetchGitHub(query: string, variables: Record<string, any> 
       'Content-Type': 'application/json',
       'User-Agent': 'Nuxt-GitHub-App',
     },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({ query: wrappedQuery, variables }),
   })
 
-  const data = await res.json()
-  
-  if (res.status > 200) {
+  if (!res.ok) {
     throw createError({
       statusCode: res.status,
-      statusMessage: 'GitHub API Authentication Error'
-    })
-  }
-  else if (data.errors) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: data.errors.map((e: any) => e.message).join(', ')
+      statusMessage: 'GitHub API Authentication Error',
     })
   }
 
-  return variables.username ? data?.data?.user : data?.data?.viewer
+  const response: GraphQLResponse<T> = await res.json()
+
+  if (response.errors) {
+    console.error('GitHub GraphQL API returned errors:', response.errors)
+    throw createError({
+      statusCode: 502,
+      statusMessage: 'Failed to fetch data from GitHub',
+    })
+  }
+
+  const result = isUserLookup ? response.data?.user : response.data?.viewer
+  if (!result) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'GitHub user not found',
+    })
+  }
+
+  return result
 }
