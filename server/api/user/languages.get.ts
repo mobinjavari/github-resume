@@ -10,9 +10,9 @@ interface LanguagesQueryResult {
     nodes: {
       languages: {
         edges: { size: number, node: { name: string, color: string | null } }[]
-      }
+      } | null
     }[]
-  }
+  } | null
 }
 
 export default defineCachedEventHandler(async (event): Promise<Languages> => {
@@ -38,8 +38,8 @@ export default defineCachedEventHandler(async (event): Promise<Languages> => {
   const result = await fetchGitHub<LanguagesQueryResult>(query, { username })
 
   const sizeByLanguage = new Map<string, { size: number, color: string | null }>()
-  for (const repo of result.repositories.nodes) {
-    for (const { size, node } of repo.languages.edges) {
+  for (const repo of result.repositories?.nodes ?? []) {
+    for (const { size, node } of repo.languages?.edges ?? []) {
       const existing = sizeByLanguage.get(node.name)
       sizeByLanguage.set(node.name, { size: (existing?.size ?? 0) + size, color: node.color })
     }

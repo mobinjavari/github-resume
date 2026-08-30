@@ -13,7 +13,7 @@ interface ActivityQueryResult {
     contributionCalendar: {
       weeks: { contributionDays: ContributionDay[] }[]
     }
-  }
+  } | null
 }
 
 export default defineCachedEventHandler(async (event): Promise<Activity> => {
@@ -41,7 +41,7 @@ export default defineCachedEventHandler(async (event): Promise<Activity> => {
   `
 
   const activity = await fetchGitHub<ActivityQueryResult>(query, { username })
-  const weeks = activity.contributionsCollection.contributionCalendar.weeks
+  const weeks = activity.contributionsCollection?.contributionCalendar.weeks ?? []
 
   const daysData: DayData[] = []
   for (const week of weeks) {
