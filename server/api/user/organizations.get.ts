@@ -1,4 +1,5 @@
 import type { Organizations } from '~/../types/user/organizations'
+import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
 
 interface OrganizationsQueryResult {
   organizations: {
@@ -6,7 +7,7 @@ interface OrganizationsQueryResult {
   }
 }
 
-export default defineEventHandler(async (event): Promise<Organizations> => {
+export default defineCachedEventHandler(async (event): Promise<Organizations> => {
   const params = getQuery(event)
   const username = params.username as string | undefined
 
@@ -24,4 +25,8 @@ export default defineEventHandler(async (event): Promise<Organizations> => {
 
   const result = await fetchGitHub<OrganizationsQueryResult>(query, { username })
   return result.organizations.nodes
+}, {
+  name: 'user-organizations',
+  maxAge: API_CACHE_MAX_AGE_SECONDS,
+  getKey: cacheKeyForUser,
 })
