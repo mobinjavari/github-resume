@@ -1,9 +1,9 @@
 export interface DayData {
-    date: string
-    count: number
+  date: string
+  count: number
 }
 
 export interface Activity {
-    url: string
-    data: DayData[]
+  url: string
+  data: DayData[]
 }
