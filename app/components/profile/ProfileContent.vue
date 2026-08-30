@@ -21,7 +21,7 @@
               {{ profile.login }}
             </a>
           </span>
-          <ProfileMeta :profile="profile" />
+          <ProfileBadge :profile="profile" />
         </div>
 
         <p
@@ -30,7 +30,7 @@
         >
           {{ profile.bio }}
         </p>
-        <ProfileBadge :profile="profile" />
+        <ProfileMeta :profile="profile" />
       </div>
     </div>
     <ProfileStats :profile="profile" />
