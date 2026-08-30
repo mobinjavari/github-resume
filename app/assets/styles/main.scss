@@ -40,6 +40,12 @@
     user-select: none;
   }
 
+  // GitHub's status emojiHTML ships its own width/height attributes; override
+  // them so the emoji always matches the badge's icon size regardless of source.
+  .emoji {
+    @apply size-3 align-text-bottom;
+  }
+
   .pattern-x {
     background-image: var(--pattern-x);
   }
