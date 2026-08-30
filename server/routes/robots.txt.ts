@@ -1,10 +1,9 @@
 export default defineEventHandler((event) => {
   const { public: { siteUrl } } = useRuntimeConfig()
-  const isProduction = process.env.NODE_ENV === 'production'
 
   setHeader(event, 'Content-Type', 'text/plain')
 
-  if (!isProduction) {
+  if (import.meta.dev) {
     return 'User-agent: *\nDisallow: /\n'
   }
 
