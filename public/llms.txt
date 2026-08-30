@@ -1,0 +1,9 @@
+# github-resume
+
+> A single-page web app that turns a GitHub account into a live, shareable resume — profile info, stats, activity, and organizations pulled straight from the GitHub API.
+
+The site has one page (`/`) rendering the profile owner's name, bio, avatar, follower/repo/star/contribution stats, a recent-activity graph, and the organizations they belong to. All content is generated at request time from the GitHub GraphQL API; there is no separate content per URL to index beyond the homepage.
+
+## Optional
+
+- [Source code](https://github.com/mobinjavari/github-resume): implementation details, API routes, and component structure.

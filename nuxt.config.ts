@@ -1,10 +1,23 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint'],
   devtools: { enabled: true },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'en' },
+    },
+  },
   css: ['@/assets/styles/main.scss'],
-  modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN
+    githubToken: process.env.GITHUB_TOKEN,
+    public: {
+      siteUrl: 'http://localhost:3000',
+    },
+  },
+  compatibilityDate: '2025-07-15',
+  eslint: {
+    config: {
+      stylistic: true,
+    },
   },
 })
