@@ -1,9 +1,25 @@
 import type { Activity, DayData } from '~/../types/user/activity'
+import { DEFAULT_ACTIVITY_DAYS, MIN_ACTIVITY_DAYS, MAX_ACTIVITY_DAYS } from '~/../constants/activity'
 
-export default defineEventHandler(async (event) => {
+interface ContributionDay {
+  date: string
+  contributionCount: number
+}
+
+interface ActivityQueryResult {
+  url: string
+  contributionsCollection: {
+    contributionCalendar: {
+      weeks: { contributionDays: ContributionDay[] }[]
+    }
+  }
+}
+
+export default defineEventHandler(async (event): Promise<Activity> => {
   const params = getQuery(event)
   const username = params.username as string | undefined
-  const days = Number(params.days) || 30
+  const requestedDays = Number(params.days) || DEFAULT_ACTIVITY_DAYS
+  const days = Math.min(Math.max(requestedDays, MIN_ACTIVITY_DAYS), MAX_ACTIVITY_DAYS)
 
   const now = new Date()
   const to = now.toISOString()
@@ -23,8 +39,8 @@ export default defineEventHandler(async (event) => {
     }
   `
 
-  const activity = await fetchGitHub(query, { username })
-  const weeks = activity?.contributionsCollection?.contributionCalendar?.weeks || []
+  const activity = await fetchGitHub<ActivityQueryResult>(query, { username })
+  const weeks = activity.contributionsCollection.contributionCalendar.weeks
 
   const daysData: DayData[] = []
   for (const week of weeks) {
@@ -33,8 +49,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return <Activity> {
-    url: activity?.url,
-    data: daysData
+  return {
+    url: activity.url,
+    data: daysData,
   }
 })
