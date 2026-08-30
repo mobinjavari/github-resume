@@ -8,8 +8,10 @@ interface GraphQLResponse<T> {
 }
 
 export async function fetchGitHub<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
-  const config = useRuntimeConfig()
-  const token = config.githubToken
+  // Read directly from process.env (not runtimeConfig): a value pulled from
+  // process.env inside nuxt.config.ts is baked in at build time, so it would
+  // never see a token supplied only when the built server actually starts.
+  const token = process.env.GITHUB_TOKEN
 
   if (!token) {
     throw createError({
