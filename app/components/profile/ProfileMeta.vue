@@ -1,40 +1,66 @@
 <template>
-    <template v-for="item in items">
-        <span v-if="item" class="text-[11px] rounded-full px-2 py-0.5 font-medium border inline-flex items-center gap-1"
-            :class="item.class">
-            <span v-if="item.html" v-html="item.html" class="size-3"></span>
-            {{ item.text }}
-        </span>
-    </template>
+  <div class="flex flex-wrap gap-2 text-xs pb-2">
+    <span
+      v-for="(item, index) in items"
+      :key="index"
+    >
+      <a
+        v-if="item"
+        :href="item.href"
+        :target="item?.targetBlank ? '_blank' : undefined"
+        class="inline-flex items-center gap-1 rounded-md border border-theme-200 dark:border-theme-800 px-2 py-1"
+        rel="noopener"
+      >
+        <component
+          :is="item.icon"
+          class="w-3 h-3"
+        />
+        {{ item.text }}
+      </a>
+    </span>
+  </div>
 </template>
 
 <script setup lang="ts">
+import CompanyIcon from '~/components/icons/CompanyIcon.vue'
+import LocationIcon from '~/components/icons/LocationIcon.vue'
+import EmailIcon from '~/components/icons/EmailIcon.vue'
+import LinkIcon from '~/components/icons/LinkIcon.vue'
+
 import type { Profile } from '~~/types/user/profile'
 
 const { profile } = defineProps<{ profile: Profile }>()
-
 const items = [
-    profile.status ? {
-        html: profile.status?.emojiHTML,
-        text: profile.status.message,
-        class: profile.status.indicatesLimitedAvailability
-            ? 'text-warning-600 bg-warning-300/20 border-warning-600/40 dark:text-warning-100 dark:bg-warning-950/20 dark:border-warning-600/40'
-            : 'text-theme-600 bg-theme-300/20 border-theme-600/40 dark:text-theme-100 dark:bg-theme-950/20 dark:border-theme-600/40'
-    } : undefined,
-    {
-        text: `Member ${timeSince(profile.createdAt)}`,
-        class: 'text-info-600 bg-info-300/20 border-info-400/40 dark:text-info-100 dark:bg-info-950/20 dark:border-info-600/40'
-    }
+  profile?.company
+    ? {
+        text: profile.company,
+        icon: CompanyIcon,
+        href: profile.company.startsWith('@') ? `https://github.com/${profile.company.slice(1)}` : undefined,
+        targetBlank: true,
+      }
+    : null,
+  profile?.location
+    ? {
+        text: profile.location,
+        icon: LocationIcon,
+        href: `https://www.google.com/maps/search/${encodeURIComponent(profile.location)}`,
+        targetBlank: true,
+      }
+    : null,
+  profile?.websiteUrl
+    ? {
+        text: profile.websiteUrl,
+        icon: LinkIcon,
+        href: profile.websiteUrl,
+        targetBlank: true,
+      }
+    : null,
+  profile?.email
+    ? {
+        text: profile.email,
+        icon: EmailIcon,
+        href: `mailto:${profile.email}`,
+      }
+    : null,
 ]
-
-function timeSince(dateString: string) {
-    const seconds = (Date.now() - new Date(dateString).getTime()) / 1000
-    const days = Math.floor(seconds / 86400)
-    const months = Math.floor(days / 30)
-    const years = Math.floor(days / 365)
-
-    if (years > 0) return `${years}y`
-    if (months > 0) return `${months}m`
-    return `${days}d`
-}
 </script>
