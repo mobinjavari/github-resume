@@ -9,7 +9,6 @@ export default defineNuxtConfig({
   },
   css: ['@/assets/styles/main.scss'],
   runtimeConfig: {
-    githubToken: process.env.GITHUB_TOKEN,
     public: {
       siteUrl: 'http://localhost:3000',
     },
