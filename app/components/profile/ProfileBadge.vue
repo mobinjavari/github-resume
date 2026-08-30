@@ -8,10 +8,9 @@
       class="text-[11px] rounded-full px-2 py-0.5 font-medium border inline-flex items-center gap-1"
       :class="item.class"
     >
-      <!-- eslint-disable vue/no-v-html -- pre-validated via sanitizeEmojiHtml, only a single trusted-shape <img> tag can pass -->
+      <!-- eslint-disable vue/no-v-html -- pre-validated via sanitizeEmojiHtml, only a single trusted-shape <img> tag can pass; sizing forced by the global .emoji rule -->
       <span
         v-if="item.html"
-        class="size-3"
         v-html="item.html"
       />
       <!-- eslint-enable vue/no-v-html -->
