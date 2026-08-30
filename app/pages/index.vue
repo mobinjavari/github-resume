@@ -1,9 +1,11 @@
 <template>
-    <Profile />
-    <Organizations />
+  <div>
+    <ProfileSection />
+    <OrganizationsSection />
+  </div>
 </template>
 
-<script setup>
-import Profile from '~/components/Profile.vue'
-import Organizations from '~/components/Organizations.vue'
+<script setup lang="ts">
+import ProfileSection from '~/components/ProfileSection.vue'
+import OrganizationsSection from '~/components/OrganizationsSection.vue'
 </script>
