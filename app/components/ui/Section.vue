@@ -12,16 +12,19 @@
     <div v-else>
       <div
         v-if="title"
-        class="flex items-center gap-3 px-5 py-4"
+        class="flex items-center justify-between gap-3 px-5 py-4"
       >
-        <component
-          :is="icon"
-          v-if="icon"
-          class="size-5 text-theme-500 dark:text-theme-400"
-        />
-        <h3 class="text-md font-semibold text-theme-800 dark:text-theme-100">
-          {{ title }}
-        </h3>
+        <div class="flex items-center gap-3">
+          <component
+            :is="icon"
+            v-if="icon"
+            class="size-5 text-theme-500 dark:text-theme-400"
+          />
+          <h3 class="text-md font-semibold text-theme-800 dark:text-theme-100">
+            {{ title }}
+          </h3>
+        </div>
+        <slot name="actions" />
       </div>
       <div :class="title ? `px-5 pb-5 pt-2 space-y-4` : ``">
         <slot />

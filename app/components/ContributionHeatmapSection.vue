@@ -6,20 +6,23 @@
     title="Contribution Activity"
     :icon="GraphIcon"
   >
-    <div class="flex gap-1.5 mb-4 overflow-x-auto">
-      <button
-        v-for="period in periods"
-        :key="period.value"
-        type="button"
-        class="flex-none whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium border transition-colors"
-        :class="period.value === selectedPeriod
-          ? 'bg-theme-800 text-theme-50 border-theme-800 dark:bg-theme-100 dark:text-theme-900 dark:border-theme-100'
-          : 'bg-theme-100 dark:bg-theme-950 border-theme-200 dark:border-theme-800 text-theme-600 dark:text-theme-400 hover:border-theme-400/50'"
-        @click="selectPeriod(period.value)"
-      >
-        {{ period.label }}
-      </button>
-    </div>
+    <template #actions>
+      <div class="relative">
+        <select
+          v-model="selectedPeriod"
+          class="appearance-none rounded-full bg-theme-100 dark:bg-theme-950 border border-theme-200 dark:border-theme-800 text-theme-600 dark:text-theme-400 text-xs font-medium pl-3 pr-7 py-1.5 outline-none cursor-pointer hover:border-theme-400/50 transition-colors"
+        >
+          <option
+            v-for="period in periods"
+            :key="period.value"
+            :value="period.value"
+          >
+            {{ period.label }}
+          </option>
+        </select>
+        <ChevronDownIcon class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 size-3 text-theme-500 dark:text-theme-400" />
+      </div>
+    </template>
 
     <div class="flex gap-2 mb-4 overflow-x-auto">
       <div
@@ -100,20 +103,23 @@
       </div>
     </div>
 
-    <div class="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-theme-500 dark:text-theme-400">
-      <span>Less</span>
-      <span
-        v-for="level in LEVEL_CLASSES"
-        :key="level"
-        class="size-2.5 rounded-sm"
-        :class="level"
-      />
-      <span>More</span>
+    <div class="mt-6 flex items-center gap-3">
+      <div class="flex-1 border-t border-theme-200 dark:border-theme-800" />
+      <div class="flex-none flex items-center gap-1.5 text-[10px] text-theme-500 dark:text-theme-400">
+        <span>Less</span>
+        <span
+          v-for="level in LEVEL_CLASSES"
+          :key="level"
+          class="size-2.5 rounded-sm"
+          :class="level"
+        />
+        <span>More</span>
+      </div>
     </div>
 
     <div
       v-if="monthlyTotals.length"
-      class="mt-6 pt-5 border-t border-theme-200 dark:border-theme-800"
+      class="mt-6"
     >
       <h4 class="text-xs font-semibold text-theme-600 dark:text-theme-400 mb-3">
         Monthly trend
@@ -140,6 +146,7 @@
 import Section from '~/components/ui/Section.vue'
 import GraphIcon from '~/components/icons/GraphIcon.vue'
 import FlameIcon from '~/components/icons/FlameIcon.vue'
+import ChevronDownIcon from '~/components/icons/ChevronDownIcon.vue'
 import type { Activity, ContributionBreakdown, DayData } from '~~/types/user/activity'
 import { MAX_ACTIVITY_DAYS } from '~~/constants/activity'
 
@@ -251,12 +258,6 @@ const stats = computed(() => [
   { label: 'Reviews', raw: breakdown.value.reviews, value: breakdown.value.reviews.toLocaleString('en-US') },
 ].filter(stat => stat.raw > 0))
 
-function selectPeriod(period: string | number) {
-  if (period === selectedPeriod.value) return
-  selectedPeriod.value = period
-  loadActivity(period)
-}
-
 async function loadActivity(period: string | number) {
   pending.value = true
   error.value = null
@@ -330,5 +331,5 @@ async function loadActivity(period: string | number) {
   }
 }
 
-onMounted(() => loadActivity(selectedPeriod.value))
+watch(selectedPeriod, period => loadActivity(period), { immediate: true })
 </script>
