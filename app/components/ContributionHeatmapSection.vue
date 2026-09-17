@@ -21,11 +21,11 @@
       </button>
     </div>
 
-    <div class="flex flex-wrap gap-2 mb-4">
+    <div class="flex gap-2 mb-4 overflow-x-auto">
       <div
         v-for="stat in stats"
         :key="stat.label"
-        class="rounded-full bg-theme-100 dark:bg-theme-950 border border-theme-200 dark:border-theme-800 px-4 py-2 flex items-center gap-2 text-[11px]"
+        class="flex-none whitespace-nowrap rounded-full bg-theme-100 dark:bg-theme-950 border border-theme-200 dark:border-theme-800 px-4 py-2 flex items-center gap-2 text-[11px]"
       >
         <span class="text-theme-500 dark:text-theme-400">{{ stat.label }}</span>
         <span class="text-sm font-semibold">{{ stat.value }}</span>
@@ -34,9 +34,9 @@
 
     <p
       v-if="busiestDay"
-      class="flex items-center gap-1.5 text-xs text-theme-600 dark:text-theme-400 mb-4"
+      class="text-xs text-theme-600 dark:text-theme-400 mb-4"
     >
-      <FlameIcon class="size-3.5 text-warning-500 flex-none" />
+      <FlameIcon class="inline-block size-3.5 mr-1 align-text-bottom text-warning-500" />
       Most active day: <span class="font-semibold text-theme-800 dark:text-theme-100">{{ formatDisplayDate(busiestDay.date) }}</span> with <span class="font-semibold text-theme-800 dark:text-theme-100">{{ busiestDay.count }}</span> contributions
     </p>
 
