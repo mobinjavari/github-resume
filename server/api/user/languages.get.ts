@@ -3,16 +3,23 @@ import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
 
 const REPOSITORY_SAMPLE_SIZE = 100
 const LANGUAGES_PER_REPOSITORY = 10
+const LANGUAGE_REPO_SOURCES = ['owned', 'organizations', 'contributed'] as const
+type LanguageRepoSource = typeof LANGUAGE_REPO_SOURCES[number]
+
+interface RepositoryNode {
+  nameWithOwner: string
+  languages: {
+    edges: { size: number, node: { name: string, color: string | null } }[]
+  } | null
+}
 
 interface LanguagesQueryResult {
-  repositories: {
-    nodes: {
-      name: string
-      languages: {
-        edges: { size: number, node: { name: string, color: string | null } }[]
-      } | null
-    }[]
-  } | null
+  // A node comes back null when the token can see the repo exists (e.g. via
+  // org/contribution affiliation) but lacks access to its details — common
+  // with fine-grained PATs that only grant specific repos.
+  ownedRepositories?: { nodes: (RepositoryNode | null)[] } | null
+  organizationRepositories?: { nodes: (RepositoryNode | null)[] } | null
+  contributedRepositories?: { nodes: (RepositoryNode | null)[] } | null
 }
 
 interface LanguageTotal {
@@ -40,31 +47,69 @@ function getMaxLanguagesDisplayed() {
   return Number.isFinite(limit) && limit > 0 ? limit : 0
 }
 
+// Which repos count toward Top Languages: "owned" (default) is only repos in the
+// user's personal namespace; "organizations" adds repos owned by orgs they belong
+// to (needs a token with read:org); "contributed" adds other people's repos they've
+// committed or opened PRs against. "all" is shorthand for every source.
+function getLanguageRepoSources(): Set<LanguageRepoSource> {
+  const requested = (process.env.LANGUAGE_REPO_SOURCES ?? '')
+    .split(',')
+    .map(source => source.trim().toLowerCase())
+    .filter(Boolean)
+
+  if (requested.includes('all')) return new Set(LANGUAGE_REPO_SOURCES)
+
+  const knownSources = requested.filter((source): source is LanguageRepoSource =>
+    (LANGUAGE_REPO_SOURCES as readonly string[]).includes(source))
+  return knownSources.length > 0 ? new Set(knownSources) : new Set(['owned'])
+}
+
 export default defineCachedEventHandler(async (event): Promise<LanguageReport> => {
   const params = getQuery(event)
   const username = params.username as string | undefined
   const ignoredLanguages = getIgnoredLanguages()
   const maxLanguagesDisplayed = getMaxLanguagesDisplayed()
+  const repoSources = getLanguageRepoSources()
 
-  const query = `
-    repositories(first: ${REPOSITORY_SAMPLE_SIZE}, ownerAffiliations: OWNER, isFork: false) {
-      nodes {
-        name
-        languages(first: ${LANGUAGES_PER_REPOSITORY}, orderBy: { field: SIZE, direction: DESC }) {
-          edges {
-            size
-            node {
-              name
-              color
-            }
-          }
+  const repositoryFields = `
+    nameWithOwner
+    languages(first: ${LANGUAGES_PER_REPOSITORY}, orderBy: { field: SIZE, direction: DESC }) {
+      edges {
+        size
+        node {
+          name
+          color
         }
       }
     }
   `
+  const repositoryOrder = 'orderBy: { field: PUSHED_AT, direction: DESC }'
 
-  const result = await fetchGitHub<LanguagesQueryResult>(query, { username })
-  const repositories = result.repositories?.nodes ?? []
+  const queryFields: string[] = []
+  if (repoSources.has('owned')) {
+    queryFields.push(`ownedRepositories: repositories(first: ${REPOSITORY_SAMPLE_SIZE}, ownerAffiliations: OWNER, isFork: false, ${repositoryOrder}) { nodes { ${repositoryFields} } }`)
+  }
+  if (repoSources.has('organizations')) {
+    queryFields.push(`organizationRepositories: repositories(first: ${REPOSITORY_SAMPLE_SIZE}, ownerAffiliations: ORGANIZATION_MEMBER, isFork: false, ${repositoryOrder}) { nodes { ${repositoryFields} } }`)
+  }
+  if (repoSources.has('contributed')) {
+    queryFields.push(`contributedRepositories: repositoriesContributedTo(first: ${REPOSITORY_SAMPLE_SIZE}, contributionTypes: [COMMIT, PULL_REQUEST], ${repositoryOrder}) { nodes { ${repositoryFields} } }`)
+  }
+
+  const result = await fetchGitHub<LanguagesQueryResult>(queryFields.join('\n'), { username })
+
+  // nameWithOwner ("owner/repo") is globally unique, so it doubles as the
+  // dedup key for repos that show up in more than one source (e.g. an org
+  // repo you've also committed to, when both sources are enabled).
+  const seenRepositories = new Set<string>()
+  const repositories: RepositoryNode[] = []
+  for (const list of [result.ownedRepositories, result.organizationRepositories, result.contributedRepositories]) {
+    for (const repo of list?.nodes ?? []) {
+      if (!repo || seenRepositories.has(repo.nameWithOwner)) continue
+      seenRepositories.add(repo.nameWithOwner)
+      repositories.push(repo)
+    }
+  }
 
   const languageTotals = new Map<string, { color: string | null, bytes: number, repositories: Set<string> }>()
   let mostPolyglotRepository: LanguageReport['mostPolyglotRepository'] = null
@@ -74,17 +119,17 @@ export default defineCachedEventHandler(async (event): Promise<LanguageReport> =
       .filter(({ node }) => !ignoredLanguages.has(node.name.toLowerCase()))
 
     if (repoLanguages.length > (mostPolyglotRepository?.languageCount ?? 1)) {
-      mostPolyglotRepository = { name: repo.name, languageCount: repoLanguages.length }
+      mostPolyglotRepository = { name: repo.nameWithOwner, languageCount: repoLanguages.length }
     }
 
     for (const { size, node } of repoLanguages) {
       const existing = languageTotals.get(node.name)
       if (existing) {
         existing.bytes += size
-        existing.repositories.add(repo.name)
+        existing.repositories.add(repo.nameWithOwner)
       }
       else {
-        languageTotals.set(node.name, { color: node.color, bytes: size, repositories: new Set([repo.name]) })
+        languageTotals.set(node.name, { color: node.color, bytes: size, repositories: new Set([repo.nameWithOwner]) })
       }
     }
   }
