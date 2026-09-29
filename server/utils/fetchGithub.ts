@@ -14,9 +14,10 @@ export async function fetchGitHub<T>(query: string, variables: Record<string, un
   const token = process.env.GITHUB_TOKEN
 
   if (!token) {
+    console.error('GITHUB_TOKEN is missing in environment variables')
     throw createError({
       statusCode: 500,
-      statusMessage: 'GITHUB_TOKEN is missing in environment variables',
+      statusMessage: 'Internal Server Error',
     })
   }
 
@@ -36,9 +37,10 @@ export async function fetchGitHub<T>(query: string, variables: Record<string, un
   })
 
   if (!res.ok) {
+    console.error(`GitHub API request failed: ${res.status} ${res.statusText}`)
     throw createError({
       statusCode: res.status,
-      statusMessage: 'GitHub API Authentication Error',
+      statusMessage: 'GitHub API request failed',
     })
   }
 

@@ -31,7 +31,7 @@ import type { Profile } from '~~/types/user/profile'
 
 const { profile } = defineProps<{ profile: Profile }>()
 const items = [
-  profile?.company
+  profile.company
     ? {
         text: profile.company,
         icon: CompanyIcon,
@@ -39,7 +39,7 @@ const items = [
         targetBlank: true,
       }
     : null,
-  profile?.location
+  profile.location
     ? {
         text: profile.location,
         icon: LocationIcon,
@@ -47,7 +47,7 @@ const items = [
         targetBlank: true,
       }
     : null,
-  profile?.websiteUrl
+  profile.websiteUrl
     ? {
         text: profile.websiteUrl,
         icon: LinkIcon,
@@ -55,7 +55,7 @@ const items = [
         targetBlank: true,
       }
     : null,
-  profile?.email
+  profile.email
     ? {
         text: profile.email,
         icon: EmailIcon,

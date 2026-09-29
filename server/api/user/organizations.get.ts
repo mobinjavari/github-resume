@@ -1,5 +1,5 @@
-import type { Organizations } from '~/../types/user/organizations'
-import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
+import type { Organizations } from '~~/types/user/organizations'
+import { API_CACHE_MAX_AGE_SECONDS } from '~~/constants/cache'
 
 interface OrganizationsQueryResult {
   organizations: {

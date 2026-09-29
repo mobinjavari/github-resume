@@ -1,6 +1,6 @@
-import type { Activity, DayData } from '~/../types/user/activity'
-import { DEFAULT_ACTIVITY_DAYS, MIN_ACTIVITY_DAYS, MAX_ACTIVITY_DAYS } from '~/../constants/activity'
-import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
+import type { Activity, DayData } from '~~/types/user/activity'
+import { DEFAULT_ACTIVITY_DAYS, MIN_ACTIVITY_DAYS, MAX_ACTIVITY_DAYS } from '~~/constants/activity'
+import { API_CACHE_MAX_AGE_SECONDS } from '~~/constants/cache'
 
 interface ContributionDay {
   date: string

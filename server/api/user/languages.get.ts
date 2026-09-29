@@ -1,5 +1,5 @@
-import type { LanguageReport, LanguageStat } from '~/../types/user/languages'
-import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
+import type { LanguageReport, LanguageStat } from '~~/types/user/languages'
+import { API_CACHE_MAX_AGE_SECONDS } from '~~/constants/cache'
 
 const REPOSITORY_SAMPLE_SIZE = 100
 const LANGUAGES_PER_REPOSITORY = 10

@@ -331,5 +331,6 @@ async function loadActivity(period: string | number) {
   }
 }
 
-watch(selectedPeriod, period => loadActivity(period), { immediate: true })
+onMounted(() => loadActivity(selectedPeriod.value))
+watch(selectedPeriod, period => loadActivity(period))
 </script>

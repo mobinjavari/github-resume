@@ -1,5 +1,5 @@
-import type { Repositories } from '~/../types/user/repository'
-import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
+import type { Repositories } from '~~/types/user/repository'
+import { API_CACHE_MAX_AGE_SECONDS } from '~~/constants/cache'
 
 const TOP_REPOS_LIMIT = 6
 

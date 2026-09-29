@@ -1,5 +1,5 @@
-import type { Profile, Status } from '~/../types/user/profile'
-import { API_CACHE_MAX_AGE_SECONDS } from '~/../constants/cache'
+import type { Profile, Status } from '~~/types/user/profile'
+import { API_CACHE_MAX_AGE_SECONDS } from '~~/constants/cache'
 
 interface ProfileQueryResult {
   name: string
